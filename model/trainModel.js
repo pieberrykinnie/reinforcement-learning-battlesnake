@@ -1,6 +1,13 @@
-import * as tf from '@tensorflow/tfjs'
+import * as tf from '@tensorflow/tfjs-node'
 
-export const trainModel = async (model, replayBuffer, batchSize, gamma, numberOfActions) => {
+export const trainModel = async (
+  model,
+  replayBuffer,
+  batchSize,
+  gamma,
+  numberOfActions,
+  inputShape
+) => {
   // Check if the buffer is large enough for a training batch
   if (replayBuffer.size() < batchSize) {
     return // Not enough experiences to train on yet

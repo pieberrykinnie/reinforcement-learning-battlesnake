@@ -86,7 +86,7 @@ const isEatingFood = (gameState, nextMove) => {
 const calculateReward = (gameState, move) => {
   // Check if the move results in hitting walls, own body, other snakes
   if (isCollision(gameState, move)) {
-    return -1.0
+    return -2.0
   }
 
   // Check if the move results in eating food

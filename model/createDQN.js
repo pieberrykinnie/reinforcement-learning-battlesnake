@@ -1,4 +1,4 @@
-import * as tf from '@tensorflow/tfjs'
+import * as tf from '@tensorflow/tfjs-node' 
 
 export function createDQN(inputShape, numActions) {
   const model = tf.sequential()

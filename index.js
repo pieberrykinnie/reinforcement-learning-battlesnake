@@ -3,21 +3,10 @@ import runServer from './server.js'
 import { calculateReward } from './model/calculateReward.js'
 import { convertGameStateToTensor } from './model/convertGameStateToTensor.js'
 import { chooseNextMove } from './features/chooseNextMove.js'
-import { createDQN } from './model/createDQN.js'
 import { trainModel } from './model/trainModel.js'
-import { isGameOver } from './features/isGameOver.js'
 import { ReplayBuffer } from './model/replayBuffer.js'
-
-// Define the input shape based on your state representation
-// For example, if you use an 11x11 grid, the input shape will be 121 (11 * 11)
-const inputShape = 121 // ! This will change
-// Define the number of possible actions
-const numberOfActions = 4 // 'up', 'down', 'left', 'right'
-// Initialize the DQN model
-const model = createDQN(inputShape, numberOfActions)
-// Initialize the replay buffer with a chosen capacity
-const replayBufferSize = 10000 // Adjust based on your memory constraints
-const replayBuffer = new ReplayBuffer(replayBufferSize)
+import { loadModel } from './model/loadModel.js'
+import { saveModel } from './model/saveModel.js'
 
 function info() {
   console.log('INFO')
@@ -39,7 +28,34 @@ function start(gameState) {
 let previousStateTensor = null
 let previousAction = null
 
-const move = (gameState) => {
+const move = (gameState, model, replayBuffer) => {
+  // Prevent a way so it doesn't run into itself
+  /* 
+  let isMoveSafe = {
+    up: true,
+    down: true,
+    left: true,
+    right: true,
+  }
+  
+  // We've included code to prevent your Battlesnake from moving backwards
+  const myHead = gameState.you.body[0]
+  const myNeck = gameState.you.body[1]
+  
+  if (myNeck.x < myHead.x) {
+    // Neck is left of head, don't move left
+    isMoveSafe.left = false
+  } else if (myNeck.x > myHead.x) {
+    // Neck is right of head, don't move right
+    isMoveSafe.right = false
+  } else if (myNeck.y < myHead.y) {
+    // Neck is below head, don't move down
+    isMoveSafe.down = false
+  } else if (myNeck.y > myHead.y) {
+    // Neck is above head, don't move up
+    isMoveSafe.up = false
+  }
+  */
   // Convert the game state to a tensor
   const currentStateTensor = convertGameStateToTensor(gameState)
 
@@ -63,7 +79,7 @@ const move = (gameState) => {
   previousStateTensor = currentStateTensor
   previousAction = convertMoveToActionIndex(nextMove) // You need to implement this conversion
 
-  console.log({ move: nextMove })
+  console.log(nextMove)
   // Return the move to the Battlesnake server
   return { move: nextMove }
 }
@@ -73,7 +89,7 @@ function convertMoveToActionIndex(move) {
   return moveActions[move]
 }
 
-function endGameInReplayBuffer() {
+function endGameInReplayBuffer(replayBuffer) {
   if (previousStateTensor && previousAction !== null) {
     // Use a reward for the terminal state if applicable
     const terminalReward = -10 // When you lose the game you get a HUGE negative reward
@@ -93,27 +109,49 @@ function endGameInReplayBuffer() {
   previousAction = null
 }
 
+const inputShape = 121 // ! This will change
+// Define the number of possible actions
+const numberOfActions = 4 // 'up', 'down', 'left', 'right'
+
 // end is called when your Battlesnake finishes a game
-function end(gameState) {
+function end(gameState, model, replayBuffer) {
   console.log('GAME OVER\n')
-  endGameInReplayBuffer()
+  endGameInReplayBuffer(replayBuffer)
 
   const batchSize = 64 // ! Example batch size, adjust as needed
   const gamma = 0.9 // ! Discount factor for future rewards
 
   // Call trainModel after a game ends to update the model
-  trainModel(model, replayBuffer, batchSize, gamma, numberOfActions)
+  trainModel(model, replayBuffer, batchSize, gamma, numberOfActions, inputShape)
     .then(() => {
       console.log('Model trained with end-of-game experience')
+      // Save the model after training
+      return saveModel(model)
     })
     .catch((err) => {
       console.error('Error during model training:', err)
     })
 }
 
-runServer({
-  info: info,
-  start: start,
-  move: move,
-  end: end,
-})
+// Define the input shape based on your state representation
+// For example, if you use an 11x11 grid, the input shape will be 121 (11 * 11)
+// At server startup
+loadModel(inputShape, numberOfActions)
+  .then((loadedModel) => {
+    // Initialize the DQN model
+    const model = loadedModel
+    // Initialize the replay buffer with a chosen capacity
+    const replayBufferSize = 10000 // Adjust based on your memory constraints
+    const replayBuffer = new ReplayBuffer(replayBufferSize)
+    // Now you can start the server, because the model is loaded
+    runServer({
+      info: info,
+      start: start,
+      move: (gameState) => move(gameState, model, replayBuffer),
+      end: (gameState) => end(gameState, model, replayBuffer),
+    })
+  })
+  .catch((error) => {
+    console.error('Failed to load or create model:', error)
+    process.exit(1) // Exit if we cannot load or create a model
+  })
