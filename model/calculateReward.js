@@ -97,5 +97,5 @@ const calculateReward = (gameState, move) => {
   // Small reward for surviving
   return 0.1
 }
-
+  
 export { calculateReward }
