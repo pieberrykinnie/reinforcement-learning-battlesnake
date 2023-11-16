@@ -1,4 +1,3 @@
-import * as tf from '@tensorflow/tfjs'
 import runServer from './server.js'
 import { calculateReward } from './model/calculateReward.js'
 import { convertGameStateToTensor } from './model/convertGameStateToTensor.js'
@@ -26,60 +25,43 @@ function start(gameState) {
 }
 
 let previousStateTensor = null
+let previousState = null // Add a variable to store the previous game state
 let previousAction = null
 
 const move = (gameState, model, replayBuffer) => {
-  // Prevent a way so it doesn't run into itself
-  /* 
-  let isMoveSafe = {
-    up: true,
-    down: true,
-    left: true,
-    right: true,
-  }
-  
-  // We've included code to prevent your Battlesnake from moving backwards
-  const myHead = gameState.you.body[0]
-  const myNeck = gameState.you.body[1]
-  
-  if (myNeck.x < myHead.x) {
-    // Neck is left of head, don't move left
-    isMoveSafe.left = false
-  } else if (myNeck.x > myHead.x) {
-    // Neck is right of head, don't move right
-    isMoveSafe.right = false
-  } else if (myNeck.y < myHead.y) {
-    // Neck is below head, don't move down
-    isMoveSafe.down = false
-  } else if (myNeck.y > myHead.y) {
-    // Neck is above head, don't move up
-    isMoveSafe.up = false
-  }
-  */
-  // Convert the game state to a tensor
+  // Convert the current game state to a tensor
   const currentStateTensor = convertGameStateToTensor(gameState)
 
   // Predict and choose the next move
   const nextMove = chooseNextMove(model, currentStateTensor)
 
-  // If previousStateTensor is not null, then we have a previous state and can capture the full experience
-  if (previousStateTensor && previousAction !== null) {
-    const reward = calculateReward(gameState, nextMove) // Calculate the reward based on the gameState
-    console.log(reward)
+  // If we have a previous state, calculate the reward based on the outcome of the previous action
+  if (
+    previousStateTensor &&
+    previousAction !== null &&
+    previousState !== null
+  ) {
+    // Calculate the reward using the previous game state and the action that was taken
+    const reward = calculateReward(previousState, previousAction)
+
     // Save the experience (S, A, R, S') to the replay buffer
     replayBuffer.push(
       previousStateTensor,
       previousAction,
       reward,
       currentStateTensor,
-      false
+      false // Assuming we have not yet determined whether the state is terminal
     )
   }
-  // Update previous state and action
-  previousStateTensor = currentStateTensor
-  previousAction = convertMoveToActionIndex(nextMove) // You need to implement this conversion
 
-  console.log(nextMove)
+  // Update previous state and action with the current information
+  previousStateTensor = currentStateTensor
+  previousState = { ...gameState } // Update the previous state with the current game state
+  previousAction = convertMoveToActionIndex(nextMove)
+
+  // Log the chosen move
+  console.log(`MOVE: ${nextMove}`)
+
   // Return the move to the Battlesnake server
   return { move: nextMove }
 }
@@ -92,7 +74,7 @@ function convertMoveToActionIndex(move) {
 function endGameInReplayBuffer(replayBuffer) {
   if (previousStateTensor && previousAction !== null) {
     // Use a reward for the terminal state if applicable
-    const terminalReward = -10 // When you lose the game you get a HUGE negative reward
+    const terminalReward = calculateReward(previousState, previousAction) // When you lose the game you get a HUGE negative reward
 
     // Add a terminal experience to the replay buffer with the done signal set to true
     replayBuffer.push(
@@ -107,6 +89,7 @@ function endGameInReplayBuffer(replayBuffer) {
   // Reset the previous state and action
   previousStateTensor = null
   previousAction = null
+  previousState = null
 }
 
 const inputShape = 121 // ! This will change

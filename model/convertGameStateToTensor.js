@@ -11,7 +11,7 @@ function visualizeBoardOnConsole(boardMatrix) {
   })
 }
 
-function convertGameStateToTensor(gameState) {
+const  convertGameStateToTensor = (gameState) => {
   const boardWidth = gameState.board.width
   const boardHeight = gameState.board.height
 

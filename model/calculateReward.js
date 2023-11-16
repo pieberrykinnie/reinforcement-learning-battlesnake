@@ -1,9 +1,6 @@
-const isCollision = (gameState, nextMove) => {
-  // Calculate the next head position based on the current head position and the next move
-  const head = gameState.you.head
+function getNextHeadPosition(head, move) {
   let nextHeadPosition = { x: head.x, y: head.y }
-
-  switch (nextMove) {
+  switch (move) {
     case 'up':
       nextHeadPosition.y += 1
       break
@@ -17,6 +14,12 @@ const isCollision = (gameState, nextMove) => {
       nextHeadPosition.x += 1
       break
   }
+  return nextHeadPosition
+}
+
+function isCollision(gameState, move) {
+  const head = gameState.you.head
+  let nextHeadPosition = getNextHeadPosition(head, move)
 
   // Check for wall collisions
   if (
@@ -28,21 +31,14 @@ const isCollision = (gameState, nextMove) => {
     return true // Collision with wall
   }
 
-  // Check for collisions with itself
-  for (const segment of gameState.you.body) {
-    if (segment.x === nextHeadPosition.x && segment.y === nextHeadPosition.y) {
-      return true // Collision with itself
-    }
-  }
-
-  // Check for collisions with other snakes
+  // Check for collisions with itself and other snakes
   for (const snake of gameState.board.snakes) {
     for (const segment of snake.body) {
       if (
         segment.x === nextHeadPosition.x &&
         segment.y === nextHeadPosition.y
       ) {
-        return true // Collision with other snake
+        return true // Collision with itself or other snake
       }
     }
   }
@@ -50,52 +46,30 @@ const isCollision = (gameState, nextMove) => {
   return false // No collision
 }
 
-const isEatingFood = (gameState, nextMove) => {
-  // Calculate the next head position based on the current head position and the next move
+function isEatingFood(gameState, move) {
   const head = gameState.you.head
-  let nextHeadPosition = { x: head.x, y: head.y }
-
-  switch (nextMove) {
-    case 'up':
-      nextHeadPosition.y += 1
-      break
-    case 'down':
-      nextHeadPosition.y -= 1
-      break
-    case 'left':
-      nextHeadPosition.x -= 1
-      break
-    case 'right':
-      nextHeadPosition.x += 1
-      break
-  }
+  let nextHeadPosition = getNextHeadPosition(head, move)
 
   // Check if the next head position is on a food item
-  for (const foodItem of gameState.board.food) {
-    if (
-      foodItem.x === nextHeadPosition.x &&
-      foodItem.y === nextHeadPosition.y
-    ) {
-      return true // The next move results in eating food
-    }
-  }
-
-  return false // The next move does not result in eating food
+  return gameState.board.food.some(
+    (food) => food.x === nextHeadPosition.x && food.y === nextHeadPosition.y
+  )
 }
 
-const calculateReward = (gameState, move) => {
-  // Check if the move results in hitting walls, own body, other snakes
+function convertActionIndexToMove(index) {
+  const moveActions = ['up', 'down', 'left', 'right']
+  return moveActions[index]
+}
+
+function calculateReward(gameState, move) {
+  move = convertActionIndexToMove(move)
   if (isCollision(gameState, move)) {
-    return -2.0
+    return -1
   }
-
-  // Check if the move results in eating food
   if (isEatingFood(gameState, move)) {
-    return 1.0
+    return 0.8
   }
-
-  // Small reward for surviving
-  return 0.1
+  return 0.1 // Small reward for surviving
 }
-  
+
 export { calculateReward }
