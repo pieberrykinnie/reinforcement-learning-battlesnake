@@ -21,9 +21,31 @@ function info() {
   }
 }
 
+function getCurrentTimeAMPM() {
+  // Create a new Date object to get the current date and time
+  const currentDate = new Date();
+
+  // Get the hours and minutes
+  const hours = currentDate.getHours();
+  const minutes = currentDate.getMinutes();
+
+  // Determine whether it's AM or PM
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+
+  // Convert hours to 12-hour format
+  const formattedHours = hours % 12 || 12;
+
+  // Format the time as a string
+  const formattedTime = `${formattedHours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+
+  return formattedTime;
+}
+
+
 // start is called when your Battlesnake begins a game
 function start(gameState) {
-  console.log(`GAME START round ${counter}`)
+  const currentTime = getCurrentTimeAMPM();
+  console.log(`GAME START round ${counter} at ${currentTime}`)
 }
 
 let previousStateTensor = null
