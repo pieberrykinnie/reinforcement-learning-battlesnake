@@ -7,6 +7,8 @@ import { ReplayBuffer } from './model/replayBuffer.js'
 import { loadModel } from './model/loadModel.js'
 import { saveModel } from './model/saveModel.js'
 
+// Tanle
+
 let counter = 1
 
 function info() {
@@ -20,31 +22,25 @@ function info() {
     tail: 'default', // TODO: Choose tail
   }
 }
-
-function getCurrentTimeAMPM() {
-  // Create a new Date object to get the current date and time
-  const currentDate = new Date();
-
-  // Get the hours and minutes
-  const hours = currentDate.getHours();
-  const minutes = currentDate.getMinutes();
-
-  // Determine whether it's AM or PM
-  const ampm = hours >= 12 ? 'PM' : 'AM';
-
-  // Convert hours to 12-hour format
-  const formattedHours = hours % 12 || 12;
+function getCurrentTimeCST() {
+  // Create a new Date object with the Central Standard Time offset (UTC-6)
+  const currentDate = new Date()
+  currentDate.setUTCHours(currentDate.getUTCHours() - 6)
 
   // Format the time as a string
-  const formattedTime = `${formattedHours}:${minutes.toString().padStart(2, '0')} ${ampm}`;
+  const formattedTime = currentDate.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+    timeZoneName: 'short',
+  })
 
-  return formattedTime;
+  return formattedTime + ' CST'
 }
-
 
 // start is called when your Battlesnake begins a game
 function start(gameState) {
-  const currentTime = getCurrentTimeAMPM();
+  const currentTime = getCurrentTimeCST()
   console.log(`GAME START round ${counter} at ${currentTime}`)
 }
 
