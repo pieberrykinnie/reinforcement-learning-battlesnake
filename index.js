@@ -7,6 +7,8 @@ import { ReplayBuffer } from './model/replayBuffer.js'
 import { loadModel } from './model/loadModel.js'
 import { saveModel } from './model/saveModel.js'
 
+let counter = 1
+
 function info() {
   console.log('INFO')
 
@@ -21,7 +23,7 @@ function info() {
 
 // start is called when your Battlesnake begins a game
 function start(gameState) {
-  console.log('GAME START')
+  console.log(`GAME START round ${counter}`)
 }
 
 let previousStateTensor = null
@@ -99,6 +101,7 @@ const numberOfActions = 4 // 'up', 'down', 'left', 'right'
 // end is called when your Battlesnake finishes a game
 function end(gameState, model, replayBuffer) {
   console.log('GAME OVER\n')
+  counter++
   endGameInReplayBuffer(replayBuffer)
 
   const batchSize = 64 // ! Example batch size, adjust as needed
