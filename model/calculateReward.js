@@ -64,10 +64,10 @@ function convertActionIndexToMove(index) {
 function calculateReward(gameState, move) {
   move = convertActionIndexToMove(move)
   if (isCollision(gameState, move)) {
-    return -1
+    return -3
   }
   if (isEatingFood(gameState, move)) {
-    return 0.5
+    return 1
   }
   return 0.1 // Small reward for surviving
 }
