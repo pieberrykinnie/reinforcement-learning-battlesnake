@@ -1,54 +1,107 @@
-import * as tf from '@tensorflow/tfjs-node' 
+import * as tf from '@tensorflow/tfjs-node'
 
-function visualizeBoardOnConsole(boardMatrix) {
-  console.log('Game Board:')
-  // Reverse the rows for printing to match visual representation
-  // This assumes that the first row of boardMatrix corresponds to the bottom row of the visual representation
-  const reversedMatrix = boardMatrix.slice().reverse()
-  reversedMatrix.forEach((row) => {
-    // Print each cell, padding single-digit numbers with a space for alignment
-    console.log(row.map((cell) => cell.toString().padEnd(2, ' ')).join(' '))
-  })
+const EMPTY = 0,
+  FOOD = 1,
+  SNAKE = 2,
+  OTHER_SNAKE = 3,
+  SNAKE_HEAD = 4
+const DIRECTIONS = {
+  UP: [1, 0, 0, 0],
+  RIGHT: [0, 1, 0, 0],
+  DOWN: [0, 0, 1, 0],
+  LEFT: [0, 0, 0, 1],
+  UNKNOWN: [0, 0, 0, 0], // Added for unknown direction
 }
 
-const  convertGameStateToTensor = (gameState) => {
-  const boardWidth = gameState.board.width
-  const boardHeight = gameState.board.height
-
-  // Initialize a 2D array filled with zeros
-  let boardMatrix = Array.from(Array(boardHeight), () =>
-    new Array(boardWidth).fill(0)
+const printGameState = (gameState) => {
+  const { width: boardWidth, height: boardHeight } = gameState.board
+  let boardMatrix = Array.from({ length: boardHeight }, () =>
+    new Array(boardWidth).fill(EMPTY)
   )
 
-  // Mark food on the board (let's say with a value of 1)
-  gameState.board.food.forEach((food) => {
-    boardMatrix[food.y][food.x] = 1
+  // Fill in the board matrix with the game state
+  gameState.board.food.forEach((food) => (boardMatrix[food.y][food.x] = FOOD))
+  gameState.you.body.forEach((segment, index) => {
+    boardMatrix[segment.y][segment.x] = index === 0 ? SNAKE_HEAD : SNAKE
   })
-
-  // Mark your snake's body on the board (let's say with a value of 2)
-  gameState.you.body.forEach((segment) => {
-    boardMatrix[segment.y][segment.x] = 2
-  })
-
-  // Optionally, mark other snakes' bodies (let's say with a value of 3)
   gameState.board.snakes.forEach((snake) => {
-    snake.body.forEach((segment) => {
-      // Check if this segment is not part of your snake
-      if (gameState.you.id !== snake.id) {
-        boardMatrix[segment.y][segment.x] = 3
-      }
-    })
+    if (snake.id !== gameState.you.id) {
+      snake.body.forEach(
+        (segment) => (boardMatrix[segment.y][segment.x] = OTHER_SNAKE)
+      )
+    }
   })
 
-  // Flatten the 2D array into a 1D array
-  let flattenedBoard = boardMatrix.flat()
+  // Determine the direction
+  const direction =
+    gameState.you.body.length > 1
+      ? getDirectionVector(gameState.you.body[0], gameState.you.body[1])
+      : DIRECTIONS.UNKNOWN
 
-  // * Additional: Visualize the board in console
-  // visualizeBoardOnConsole(boardMatrix)
+  // Print the board matrix, flipped vertically
+  console.log('Board State:')
+  boardMatrix.reverse().forEach((row) => {
+    console.log(row.map((cell) => {
+      switch (cell) {
+        case EMPTY: return '·'
+        case FOOD: return 'F'
+        case SNAKE: return 'S'
+        case OTHER_SNAKE: return 'O'
+        case SNAKE_HEAD: return 'H'
+        default: return '?'
+      }
+    }).join(' '))
+  })
 
-  // Convert the 1D array into a TensorFlow.js tensor
-  // Assuming TensorFlow.js (tf) is already imported and available
-  return tf.tensor(flattenedBoard, [1, boardWidth * boardHeight])
+  // Print the direction
+  console.log('Direction:', Object.keys(DIRECTIONS).find(key => DIRECTIONS[key] === direction) || 'UNKNOWN')
+}
+
+// Use this function to print the game state in a readable format
+
+const getDirectionVector = (head, neck) => {
+  if (!head || !neck || (head.x === neck.x && head.y === neck.y)) {
+    return DIRECTIONS.UNKNOWN // Default to unknown direction
+  }
+
+  if (head.y > neck.y) return DIRECTIONS.UP
+  if (head.y < neck.y) return DIRECTIONS.DOWN
+  if (head.x > neck.x) return DIRECTIONS.RIGHT
+  if (head.x < neck.x) return DIRECTIONS.LEFT
+}
+
+const convertGameStateToTensor = (gameState) => {
+  const { width: boardWidth, height: boardHeight } = gameState.board
+
+  let boardMatrix = Array.from({ length: boardHeight }, () =>
+    new Array(boardWidth).fill(EMPTY)
+  )
+
+  gameState.board.food.forEach((food) => (boardMatrix[food.y][food.x] = FOOD))
+
+  gameState.you.body.forEach((segment, index) => {
+    boardMatrix[segment.y][segment.x] = index === 0 ? SNAKE_HEAD : SNAKE
+  })
+
+  gameState.board.snakes.forEach((snake) => {
+    if (snake.id !== gameState.you.id) {
+      snake.body.forEach(
+        (segment) => (boardMatrix[segment.y][segment.x] = OTHER_SNAKE)
+      )
+    }
+  })
+
+  const direction =
+    gameState.you.body.length > 1
+      ? getDirectionVector(gameState.you.body[0], gameState.you.body[1])
+      : DIRECTIONS.UNKNOWN // Use UNKNOWN if the snake has only one segment
+
+  const stateRepresentation = [...boardMatrix.flat(), ...direction]
+
+  // Print the state representation array before converting to a tensor
+  // printGameState(gameState)
+
+  return tf.tensor(stateRepresentation, [1, stateRepresentation.length])
 }
 
 export { convertGameStateToTensor }

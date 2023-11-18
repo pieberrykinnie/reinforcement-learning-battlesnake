@@ -112,7 +112,7 @@ function endGameInReplayBuffer(replayBuffer) {
   previousState = null
 }
 
-const inputShape = 121 // ! This will change
+const inputShape = 121 + 4 // ! Added for cuz is 11 * 11 plus the 4th which is direction and 1 for unknown directions
 // Define the number of possible actions
 const numberOfActions = 4 // 'up', 'down', 'left', 'right'
 
@@ -122,8 +122,8 @@ function end(gameState, model, replayBuffer) {
   counter++
   endGameInReplayBuffer(replayBuffer)
 
-  const batchSize = 64 // ! Example batch size, adjust as needed
-  const gamma = 0.9 // ! Discount factor for future rewards
+  const batchSize = 80 // ! Example batch size, adjust as needed
+  const gamma = 0.78 // ! Discount factor for future rewards
 
   // Call trainModel after a game ends to update the model
   trainModel(model, replayBuffer, batchSize, gamma, numberOfActions, inputShape)

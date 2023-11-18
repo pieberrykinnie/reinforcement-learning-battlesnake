@@ -6,7 +6,7 @@ import { createDQN } from './createDQN.js'
 export const loadModel = async (inputShape, numberOfActions) => {
   const dirname = path.dirname(fileURLToPath(import.meta.url))
   const modelFilePath = path.join(dirname, '..', 'saved_model', 'model.json')
-
+  
   try {
     const model = await tf.loadLayersModel(`file://${modelFilePath}`)
     console.log(`Model loaded from file://${modelFilePath}`)
