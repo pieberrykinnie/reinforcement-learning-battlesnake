@@ -125,8 +125,8 @@ function end(gameState, model, replayBuffer) {
   console.log(`Round ${counter} at ${currentTime}`)
   endGameInReplayBuffer(replayBuffer)
 
-  const batchSize = 100 // ! Example batch size, adjust as needed
-  const gamma = 0.9 // ! Discount factor for future rewards
+  const batchSize = 48 // ! Example batch size, adjust as needed
+  const gamma = 0.8 // ! Discount factor for future rewards
 
   // Call trainModel after a game ends to update the model
   trainModel(model, replayBuffer, batchSize, gamma, numberOfActions, inputShape)
@@ -148,7 +148,7 @@ loadModel(inputShape, numberOfActions)
     // Initialize the DQN model
     const model = loadedModel
     // Initialize the replay buffer with a chosen capacity
-    const replayBufferSize = 10000 // Adjust based on your memory constraints
+    const replayBufferSize = 1000 // Adjust based on your memory constraints
     const replayBuffer = new ReplayBuffer(replayBufferSize)
     // Now you can start the server, because the model is loaded
     runServer({
