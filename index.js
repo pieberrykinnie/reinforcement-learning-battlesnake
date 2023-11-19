@@ -148,7 +148,7 @@ loadModel(inputShape, numberOfActions)
     // Initialize the DQN model
     const model = loadedModel
     // Initialize the replay buffer with a chosen capacity
-    const replayBufferSize = 100000 // Adjust based on your memory constraints
+    const replayBufferSize = 10000 // Adjust based on your memory constraints
     const replayBuffer = new ReplayBuffer(replayBufferSize)
     // Now you can start the server, because the model is loaded
     runServer({
