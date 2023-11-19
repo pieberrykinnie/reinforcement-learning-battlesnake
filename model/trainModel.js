@@ -14,6 +14,10 @@ export const trainModel = async (
       `Not enough experiences in buffer to train. Size ${replayBuffer.size()}`
     )
     return // Not enough experiences to train on yet
+  } else {
+    console.log(
+      `Batch Size: ${replayBuffer.size()}`
+    )
   }
 
   // Sample a batch of experiences from the buffer
