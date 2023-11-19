@@ -49,11 +49,11 @@ function convertActionIndexToMove(index) {
 
 function calculateReward(gameState, move) {
   move = convertActionIndexToMove(move)
+  if (isEatingFood(gameState, move)) {
+    return 10
+  }
   if (isNearBorder(gameState, move)) {
     return -3
-  }
-  if (isEatingFood(gameState, move)) {
-    return 5
   }
   return 0.1 // Small reward for surviving
 }
