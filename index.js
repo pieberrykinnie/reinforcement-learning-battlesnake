@@ -122,7 +122,7 @@ function end(gameState, model, replayBuffer) {
   counter++
   endGameInReplayBuffer(replayBuffer)
 
-  const batchSize = 80 // ! Example batch size, adjust as needed
+  const batchSize = 100 // ! Example batch size, adjust as needed
   const gamma = 0.9 // ! Discount factor for future rewards
 
   // Call trainModel after a game ends to update the model

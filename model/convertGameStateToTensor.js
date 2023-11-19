@@ -113,7 +113,7 @@ const convertGameStateToTensor = (gameState) => {
   const stateRepresentation = [...boardMatrix.flat(), ...direction]
 
   // Print the state representation array before converting to a tensor
-  // printGameState(gameState)
+  printGameState(gameState)
   return tf.tensor(stateRepresentation, [1, stateRepresentation.length])
 }
 
