@@ -55,7 +55,7 @@ function calculateReward(gameState, move) {
   if (isEatingFood(gameState, move)) {
     return 5
   }
-  return 0.01 // Small reward for surviving
+  return 0.1 // Small reward for surviving
 }
 
 export { calculateReward }
