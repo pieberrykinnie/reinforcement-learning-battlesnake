@@ -10,6 +10,9 @@ export const trainModel = async (
 ) => {
   // Check if the buffer is large enough for a training batch
   if (replayBuffer.size() < batchSize) {
+    console.log(
+      `Not enough experiences in buffer to train. Size ${replayBuffer.size()}`
+    )
     return // Not enough experiences to train on yet
   }
 
@@ -22,7 +25,10 @@ export const trainModel = async (
 
   for (const experience of batch) {
     const { state, action, reward, nextState, done } = experience
-
+    if (state.size !== inputShape || (nextState && nextState.size !== inputShape)) {
+      console.error('State or nextState does not have the correct number of elements.');
+      return;
+    }
     // Predict Q-values for the current state
     const currentQs = model.predict(state).dataSync()
 
@@ -50,4 +56,5 @@ export const trainModel = async (
   // Dispose tensors to free memory
   inputTensor.dispose()
   targetTensor.dispose()
+  console.log('Model trained successfully')
 }
