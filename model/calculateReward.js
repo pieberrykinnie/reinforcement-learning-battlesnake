@@ -17,34 +17,6 @@ function getNextHeadPosition(head, move) {
   return nextHeadPosition
 }
 
-function isCollision(gameState, move) {
-  const head = gameState.you.head
-  let nextHeadPosition = getNextHeadPosition(head, move)
-
-  // Check for wall collisions
-  if (
-    nextHeadPosition.x < 0 ||
-    nextHeadPosition.x >= gameState.board.width ||
-    nextHeadPosition.y < 0 ||
-    nextHeadPosition.y >= gameState.board.height
-  ) {
-    return true // Collision with wall
-  }
-
-  // Check for collisions with itself and other snakes
-  for (const snake of gameState.board.snakes) {
-    for (const segment of snake.body) {
-      if (
-        segment.x === nextHeadPosition.x &&
-        segment.y === nextHeadPosition.y
-      ) {
-        return true // Collision with itself or other snake
-      }
-    }
-  }
-
-  return false // No collision
-}
 function isNearBorder(gameState, move) {
   const head = gameState.you.head
   const boardWidth = gameState.board.width
