@@ -45,7 +45,21 @@ function isCollision(gameState, move) {
 
   return false // No collision
 }
+function isNearBorder(gameState, move) {
+  const head = gameState.you.head
+  const boardWidth = gameState.board.width
+  const boardHeight = gameState.board.height
+  // Define border proximity (1 means directly adjacent to the border)
+  const borderProximity = 1
+  let nextHeadPosition = getNextHeadPosition(head, move)
 
+  return (
+    nextHeadPosition.x < borderProximity ||
+    nextHeadPosition.x >= boardWidth - borderProximity ||
+    nextHeadPosition.y < borderProximity ||
+    nextHeadPosition.y >= boardHeight - borderProximity
+  )
+}
 function isEatingFood(gameState, move) {
   const head = gameState.you.head
   let nextHeadPosition = getNextHeadPosition(head, move)
@@ -63,11 +77,11 @@ function convertActionIndexToMove(index) {
 
 function calculateReward(gameState, move) {
   move = convertActionIndexToMove(move)
-  if (isCollision(gameState, move)) { // This is useless
+  if (isNearBorder(gameState, move)) {
     return -3
   }
   if (isEatingFood(gameState, move)) {
-    return 1
+    return 5
   }
   return 0.01 // Small reward for surviving
 }

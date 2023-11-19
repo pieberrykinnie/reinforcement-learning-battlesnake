@@ -94,7 +94,7 @@ function convertMoveToActionIndex(move) {
 function endGameInReplayBuffer(replayBuffer) {
   if (previousStateTensor && previousAction !== null) {
     // Use a reward for the terminal state if applicable
-    const terminalReward = -3 // When you lose the game you get a HUGE negative reward
+    const terminalReward = -10 // When you lose the game you get a HUGE negative reward
     console.log(`REWARD: ${terminalReward}`)
     console.log(previousAction)
     // Add a terminal experience to the replay buffer with the done signal set to true
