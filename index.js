@@ -7,7 +7,7 @@ import { ReplayBuffer } from './model/replayBuffer.js'
 import { loadModel } from './model/loadModel.js'
 import { saveModel } from './model/saveModel.js'
 
-//        
+// Tanle 
 
 let counter = 1
 
@@ -125,7 +125,7 @@ function end(gameState, model, replayBuffer) {
   console.log(`Round ${counter} at ${currentTime}`)
   endGameInReplayBuffer(replayBuffer)
 
-  const batchSize = 228 // ! Example batch size, adjust as needed 
+  const batchSize = 328 // ! Example batch size, adjust as needed 
   const gamma = 0.8 // ! Discount factor for future rewards
 
   // Call trainModel after a game ends to update the model
