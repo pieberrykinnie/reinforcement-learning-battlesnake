@@ -57,16 +57,18 @@ function isEatingFood(gameState, move) {
 }
 
 function convertActionIndexToMove(index) {
-  const moveActions = ['up', 'down', 'left', 'right']
+  const moveActions = ['up', 'right', 'down', 'left']
   return moveActions[index]
 }
 
 function calculateReward(gameState, move) {
   move = convertActionIndexToMove(move)
-  if (isCollision(gameState, move)) {
+  if (isCollision(gameState, move)) { // This is useless
+    console.log(`COLLISION: ${move}`)
     return -3
   }
   if (isEatingFood(gameState, move)) {
+    console.log(`Eating: ${move}`)
     return 1
   }
   return 0.1 // Small reward for surviving

@@ -63,7 +63,7 @@ const move = (gameState, model, replayBuffer) => {
   ) {
     // Calculate the reward using the previous game state and the action that was taken
     const reward = calculateReward(previousState, previousAction)
-
+    console.log(`REWARD: ${reward}`)
     // Save the experience (S, A, R, S') to the replay buffer
     replayBuffer.push(
       previousStateTensor,
@@ -94,8 +94,9 @@ function convertMoveToActionIndex(move) {
 function endGameInReplayBuffer(replayBuffer) {
   if (previousStateTensor && previousAction !== null) {
     // Use a reward for the terminal state if applicable
-    const terminalReward = calculateReward(previousState, previousAction) // When you lose the game you get a HUGE negative reward
-
+    const terminalReward = -3 // When you lose the game you get a HUGE negative reward
+    console.log(`REWARD: ${terminalReward}`)
+    console.log(previousAction)
     // Add a terminal experience to the replay buffer with the done signal set to true
     replayBuffer.push(
       previousStateTensor,
