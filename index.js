@@ -121,6 +121,8 @@ const numberOfActions = 4 // 'up', 'down', 'left', 'right'
 function end(gameState, model, replayBuffer) {
   console.log('GAME OVER\n')
   counter++
+  const currentTime = getCurrentTimeCST()
+  console.log(`Round ${counter} at ${currentTime}`)
   endGameInReplayBuffer(replayBuffer)
 
   const batchSize = 100 // ! Example batch size, adjust as needed
