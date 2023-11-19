@@ -41,20 +41,34 @@ const printGameState = (gameState) => {
   // Print the board matrix, flipped vertically
   console.log('Board State:')
   boardMatrix.reverse().forEach((row) => {
-    console.log(row.map((cell) => {
-      switch (cell) {
-        case EMPTY: return '·'
-        case FOOD: return 'F'
-        case SNAKE: return 'S'
-        case OTHER_SNAKE: return 'O'
-        case SNAKE_HEAD: return 'H'
-        default: return '?'
-      }
-    }).join(' '))
+    console.log(
+      row
+        .map((cell) => {
+          switch (cell) {
+            case EMPTY:
+              return '·'
+            case FOOD:
+              return 'F'
+            case SNAKE:
+              return 'S'
+            case OTHER_SNAKE:
+              return 'O'
+            case SNAKE_HEAD:
+              return 'H'
+            default:
+              return '?'
+          }
+        })
+        .join(' ')
+    )
   })
 
   // Print the direction
-  console.log('Direction:', Object.keys(DIRECTIONS).find(key => DIRECTIONS[key] === direction) || 'UNKNOWN')
+  console.log(
+    'Direction:',
+    Object.keys(DIRECTIONS).find((key) => DIRECTIONS[key] === direction) ||
+      'UNKNOWN'
+  )
 }
 
 // Use this function to print the game state in a readable format
@@ -100,7 +114,6 @@ const convertGameStateToTensor = (gameState) => {
 
   // Print the state representation array before converting to a tensor
   // printGameState(gameState)
-
   return tf.tensor(stateRepresentation, [1, stateRepresentation.length])
 }
 

@@ -53,7 +53,7 @@ const move = (gameState, model, replayBuffer) => {
   const currentStateTensor = convertGameStateToTensor(gameState)
 
   // Predict and choose the next move
-  const nextMove = chooseNextMove(model, currentStateTensor)
+  const nextMove = chooseNextMove(model, currentStateTensor, gameState)
 
   // If we have a previous state, calculate the reward based on the outcome of the previous action
   if (
@@ -87,7 +87,7 @@ const move = (gameState, model, replayBuffer) => {
 }
 
 function convertMoveToActionIndex(move) {
-  const moveActions = { up: 0, down: 1, left: 2, right: 3 }
+  const moveActions = { up: 0, right: 1, down: 2, left: 3 }
   return moveActions[move]
 }
 
@@ -123,7 +123,7 @@ function end(gameState, model, replayBuffer) {
   endGameInReplayBuffer(replayBuffer)
 
   const batchSize = 80 // ! Example batch size, adjust as needed
-  const gamma = 0.78 // ! Discount factor for future rewards
+  const gamma = 0.9 // ! Discount factor for future rewards
 
   // Call trainModel after a game ends to update the model
   trainModel(model, replayBuffer, batchSize, gamma, numberOfActions, inputShape)
