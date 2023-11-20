@@ -7,7 +7,7 @@ import { ReplayBuffer } from './model/replayBuffer.js'
 import { loadModel } from './model/loadModel.js'
 import { saveModel } from './model/saveModel.js'
 
-// Tanle     
+//           
 
 let counter = 1
 
@@ -126,7 +126,7 @@ function end(gameState, model, replayBuffer) {
   endGameInReplayBuffer(replayBuffer)
 
   const batchSize = 328 // ! Example batch size, adjust as needed 
-  const gamma = 0.8 // ! Discount factor for future rewards
+  const gamma = 0.85 // ! Discount factor for future rewards
 
   // Call trainModel after a game ends to update the model
   trainModel(model, replayBuffer, batchSize, gamma, numberOfActions, inputShape)
@@ -148,7 +148,7 @@ loadModel(inputShape, numberOfActions)
     // Initialize the DQN model
     const model = loadedModel
     // Initialize the replay buffer with a chosen capacity
-    const replayBufferSize = 10000 // Adjust based on your memory constraints
+    const replayBufferSize =  5000 // Adjust based on your memory constraints
     const replayBuffer = new ReplayBuffer(replayBufferSize)
     // Now you can start the server, because the model is loaded
     runServer({
