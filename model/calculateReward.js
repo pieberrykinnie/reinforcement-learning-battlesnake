@@ -53,7 +53,7 @@ function calculateReward(gameState, move) {
     return 10
   }
   if (isNearBorder(gameState, move)) {
-    return -3
+    return -1
   }
   return 0.1 // Small reward for surviving
 }
