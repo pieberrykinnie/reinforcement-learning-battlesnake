@@ -229,7 +229,7 @@ export const chooseNextMove = (model, currentStateTensor, gameState) => {
   console.log("unpreferred moves " + unpreferredMoveList)
   for (let i = 0; i < rankedActions.length; i++) {
     if (unpreferredMoveList.includes(rankedActions[i].action)) {
-      rankedActions[i].value -= 10;
+      rankedActions[i].value -= 15;
       console.log(rankedActions[i].action + " would be a bad move")
     }
   }
