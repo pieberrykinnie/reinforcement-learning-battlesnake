@@ -145,7 +145,7 @@ function lookForFood(gameState) {
 // on the snake's health and how far it is from the given food in the previous function
 function goForFood(nearestFood, gameState) {
   const head = gameState.you.head;
-  const foodPriorityMultiplier = 700; // Modify this to determine how much the snake prioritizes food
+  const foodPriorityMultiplier = 800; // Modify this to determine how much the snake prioritizes food
 
   // Default value
   // Would be slightly better if it were a list of possible moves and multipliers added to them instead;
@@ -261,9 +261,9 @@ export const chooseNextMove = (model, currentStateTensor, gameState) => {
     }
   }
 
-  const bumpDemotivator = 15; // Adjust to change how much the snake wants to avoid possible bumps
+  const bumpDemotivator = 20; // Adjust to change how much the snake wants to avoid possible bumps
   let possibleBumps = checkCornersForSnakes(gameState);
-  // console.log("unpreferred moves " + possibleBumps)
+  console.log("unpreferred moves " + possibleBumps)
   for (let i = 0; i < rankedActions.length; i++) {
     if (possibleBumps.includes(rankedActions[i].action)) {
       rankedActions[i].value -= bumpDemotivator;
@@ -279,9 +279,9 @@ export const chooseNextMove = (model, currentStateTensor, gameState) => {
     }
   }
 
-  // for (let i = 0; i < rankedActions.length; i++) {
-  //   console.log("action " + rankedActions[i].action + " value " + rankedActions[i].value)
-  // }
+  for (let i = 0; i < rankedActions.length; i++) {
+    console.log("action " + rankedActions[i].action + " value " + rankedActions[i].value)
+  }
   // End of Peter's code
 
   rankedActions = rankedActions.sort((a, b) => b.value - a.value)
