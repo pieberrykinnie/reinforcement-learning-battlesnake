@@ -50,45 +50,74 @@ function isCollision(gameState, move) {
 }
 
 // Start of Peter's code
+// Check if:
+// - The corner right next to our snake's head has an enemy snake's head
+// - The two squares directly in front of our snake has an enemy snake's head
 function checkCornersForSnakes(gameState) {
   const head = gameState.you.head;
+  // Filter out our own snake before comparing locations
   const snakeLocations = gameState.board.snakes.filter(
     function(x) {
       return x.id != gameState.you.id;
     }
   )
 
-  let unsafeMoves = [];
-  let enemySnake;
+  let possibleBumpMoves = [];
 
+  let enemySnake;
+  
+  // Run a loop to check every possible non-ours snake in the board
   for (let i = 0; i < snakeLocations.length; i++) {
     enemySnake = snakeLocations[i].body;
 
-    for (let j = 0; j < enemySnake.length; j++) {
-      if (enemySnake.length >= gameState.you.body.length) {
-        if (((enemySnake[j].y - head.y === 1 && Math.abs(enemySnake[j].x - head.x) === 1)
-        || (enemySnake[0].y - head.y === 2 && enemySnake[0].x === head.x)) && !unsafeMoves.includes(0)) {
-          unsafeMoves.push(0);
-        }
-        if (((enemySnake[j].x - head.x === 1 && Math.abs(enemySnake[j].y - head.y) === 1)
-        || (enemySnake[0].x - head.x === 2 && enemySnake[0].y === head.y)) && !unsafeMoves.includes(1)) {
-          unsafeMoves.push(1);
-        }
-        if (((enemySnake[j].y - head.y === -1 && Math.abs(enemySnake[j].x - head.x) === 1)
-        || (enemySnake[0].y - head.y === -2 && enemySnake[0].x === head.x)) && !unsafeMoves.includes(2)) {
-          unsafeMoves.push(2);
-        }
-        if (((enemySnake[j].x - head.x === -1 && Math.abs(enemySnake[j].y - head.y) === 1)
-        || (enemySnake[0].x - head.x === -2 && enemySnake[0].y === head.y)) && !unsafeMoves.includes(3)) {
-          unsafeMoves.push(3);
-        }
+    // Check instead for all enemy snake's body parts for the first case
+    // for (let j = 0; j < enemySnake.length; j++) {
+    //   if (enemySnake.length >= gameState.you.body.length) {
+    //     if (((enemySnake[j].y - head.y === 1 && Math.abs(enemySnake[j].x - head.x) === 1)
+    //     || (enemySnake[0].y - head.y === 2 && enemySnake[0].x === head.x)) && !unsafeMoves.includes(0)) {
+    //       unsafeMoves.push(0);
+    //     }
+    //     if (((enemySnake[j].x - head.x === 1 && Math.abs(enemySnake[j].y - head.y) === 1)
+    //     || (enemySnake[0].x - head.x === 2 && enemySnake[0].y === head.y)) && !unsafeMoves.includes(1)) {
+    //       unsafeMoves.push(1);
+    //     }
+    //     if (((enemySnake[j].y - head.y === -1 && Math.abs(enemySnake[j].x - head.x) === 1)
+    //     || (enemySnake[0].y - head.y === -2 && enemySnake[0].x === head.x)) && !unsafeMoves.includes(2)) {
+    //       unsafeMoves.push(2);
+    //     }
+    //     if (((enemySnake[j].x - head.x === -1 && Math.abs(enemySnake[j].y - head.y) === 1)
+    //     || (enemySnake[0].x - head.x === -2 && enemySnake[0].y === head.y)) && !unsafeMoves.includes(3)) {
+    //       unsafeMoves.push(3);
+    //     }
+    //   }
+    // }
+
+    enemySnakeHead = snakeLocations[i].head;
+    // Only check for bumps if the enemy snake in question is longer or equal to ours
+    if (enemySnake.length >= gameState.you.body.length) {
+      if (((enemySnakeHead.y - head.y === 1 && Math.abs(enemySnakeHead.x - head.x) === 1)
+      || (enemySnakeHead.y - head.y === 2 && enemySnakeHead.x === head.x)) && !unsafeMoves.includes(0)) {
+         unsafeMoves.push(0);
+      }
+      if (((enemySnakeHead.x - head.x === 1 && Math.abs(enemySnakeHead.y - head.y) === 1)
+      || (enemySnakeHead.x - head.x === 2 && enemySnakeHead.y === head.y)) && !unsafeMoves.includes(1)) {
+        unsafeMoves.push(1);
+      }
+      if (((enemySnakeHead.y - head.y === -1 && Math.abs(enemySnakeHead.x - head.x) === 1)
+      || (enemySnakeHead.y - head.y === -2 && enemySnakeHead.x === head.x)) && !unsafeMoves.includes(2)) {
+        unsafeMoves.push(2);
+      }
+      if (((enemySnakeHead.x - head.x === -1 && Math.abs(enemySnakeHead.y - head.y) === 1)
+      || (enemySnakeHead.x - head.x === -2 && enemySnakeHead.y === head.y)) && !unsafeMoves.includes(3)) {
+        unsafeMoves.push(3);
       }
     }
   }
 
-  return unsafeMoves;
+  return possibleBumpMoves;
 }
 
+// Look at all the food on the table and save the location of the nearest food to snake's head
 function lookForFood(gameState) {
   const head = gameState.you.head;
   const foodLocations = gameState.board.food;
@@ -111,10 +140,15 @@ function lookForFood(gameState) {
   return nearestFood;
 }
 
+// Pick a single move to prioritize and add the q-values of such move by a certain amount depending
+// on the snake's health and how far it is from the given food in the previous function
 function goForFood(nearestFood, gameState) {
   const head = gameState.you.head;
-  const foodPriorityMultiplier = 700;
+  const foodPriorityMultiplier = 700; // Modify this to determine how much the snake prioritizes food
 
+  // Default value
+  // Would be slightly better if it were a list of possible moves and multipliers added to them instead;
+  // but a hassle to make work
   let priority = {move: 4, multiplier: 0.01};
 
   let distanceToFoodX = nearestFood.x - head.x;
@@ -163,6 +197,7 @@ function goForFood(nearestFood, gameState) {
   return priority;
 }
 
+// Function so the snake is demotivated from going to and staying on the edges so as not to get trapped
 function avoidEdges(gameState) {
   const head = gameState.you.head;
 
@@ -217,35 +252,35 @@ export const chooseNextMove = (model, currentStateTensor, gameState) => {
   }
   
   // Start of Peter's code
-  let preferredMove = goForFood(lookForFood(gameState), gameState);
-  console.log("preferred move " + preferredMove.move)
+  let moveForFood = goForFood(lookForFood(gameState), gameState);
+  // console.log("preferred move " + moveForFood.move)
   for (let i = 0; i < rankedActions.length; i++) {
-    if (rankedActions[i].action === preferredMove.move) {
-      rankedActions[i].value += preferredMove.multiplier;
+    if (rankedActions[i].action === moveForFood.move) {
+      rankedActions[i].value += moveForFood.multiplier;
     }
   }
 
-  let unpreferredMoveList = checkCornersForSnakes(gameState);
-  console.log("unpreferred moves " + unpreferredMoveList)
+  const bumpDemotivator = 15; // Adjust to change how much the snake wants to avoid possible bumps
+  let possibleBumps = checkCornersForSnakes(gameState);
+  // console.log("unpreferred moves " + possibleBumps)
   for (let i = 0; i < rankedActions.length; i++) {
-    if (unpreferredMoveList.includes(rankedActions[i].action)) {
-      rankedActions[i].value -= 15;
-      console.log(rankedActions[i].action + " would be a bad move")
+    if (possibleBumps.includes(rankedActions[i].action)) {
+      rankedActions[i].value -= bumpDemotivator;
     }
   }
 
-  let unsureMoveList = avoidEdges(gameState);
-  console.log("unsure moves " + unsureMoveList)
+  const wallDemotivator = 3; // Adjust to change how much the snake wants to avoid being on the edges
+  let movesToWall = avoidEdges(gameState);
+  // console.log("unsure moves " + movesToWall)
   for (let i = 0; i < rankedActions.length; i++) {
-    if (unsureMoveList.includes(rankedActions[i].action)) {
-      rankedActions[i].value -= 2;
-      console.log(rankedActions[i].action + " would be an edge move")
+    if (movesToWall.includes(rankedActions[i].action)) {
+      rankedActions[i].value -= wallDemotivator;
     }
   }
 
-  for (let i = 0; i < rankedActions.length; i++) {
-    console.log("action " + rankedActions[i].action + " value " + rankedActions[i].value)
-  }
+  // for (let i = 0; i < rankedActions.length; i++) {
+  //   console.log("action " + rankedActions[i].action + " value " + rankedActions[i].value)
+  // }
   // End of Peter's code
 
   rankedActions = rankedActions.sort((a, b) => b.value - a.value)
