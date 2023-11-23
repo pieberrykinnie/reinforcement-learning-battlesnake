@@ -65,6 +65,7 @@ function checkCornersForSnakes(gameState) {
   let possibleBumpMoves = [];
 
   let enemySnake;
+  let enemySnakeHead;
   
   // Run a loop to check every possible non-ours snake in the board
   for (let i = 0; i < snakeLocations.length; i++) {
@@ -96,20 +97,20 @@ function checkCornersForSnakes(gameState) {
     // Only check for bumps if the enemy snake in question is longer or equal to ours
     if (enemySnake.length >= gameState.you.body.length) {
       if (((enemySnakeHead.y - head.y === 1 && Math.abs(enemySnakeHead.x - head.x) === 1)
-      || (enemySnakeHead.y - head.y === 2 && enemySnakeHead.x === head.x)) && !unsafeMoves.includes(0)) {
-         unsafeMoves.push(0);
+      || (enemySnakeHead.y - head.y === 2 && enemySnakeHead.x === head.x)) && !possibleBumpMoves.includes(0)) {
+        possibleBumpMoves.push(0);
       }
       if (((enemySnakeHead.x - head.x === 1 && Math.abs(enemySnakeHead.y - head.y) === 1)
-      || (enemySnakeHead.x - head.x === 2 && enemySnakeHead.y === head.y)) && !unsafeMoves.includes(1)) {
-        unsafeMoves.push(1);
+      || (enemySnakeHead.x - head.x === 2 && enemySnakeHead.y === head.y)) && !possibleBumpMoves.includes(1)) {
+        possibleBumpMoves.push(1);
       }
       if (((enemySnakeHead.y - head.y === -1 && Math.abs(enemySnakeHead.x - head.x) === 1)
-      || (enemySnakeHead.y - head.y === -2 && enemySnakeHead.x === head.x)) && !unsafeMoves.includes(2)) {
-        unsafeMoves.push(2);
+      || (enemySnakeHead.y - head.y === -2 && enemySnakeHead.x === head.x)) && !possibleBumpMoves.includes(2)) {
+        possibleBumpMoves.push(2);
       }
       if (((enemySnakeHead.x - head.x === -1 && Math.abs(enemySnakeHead.y - head.y) === 1)
-      || (enemySnakeHead.x - head.x === -2 && enemySnakeHead.y === head.y)) && !unsafeMoves.includes(3)) {
-        unsafeMoves.push(3);
+      || (enemySnakeHead.x - head.x === -2 && enemySnakeHead.y === head.y)) && !possibleBumpMoves.includes(3)) {
+        possibleBumpMoves.push(3);
       }
     }
   }
