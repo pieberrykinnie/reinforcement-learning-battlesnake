@@ -19,7 +19,7 @@ function info() {
     author: '', // TODO: Your Battlesnake Username
     color: '#069420', // TODO: Choose color
     head: 'gamer', // TODO: Choose head
-    tail: 'weight', // TODO: Choose tail88
+    tail: 'nr-booster', // TODO: Choose tail88
   }
 }
 function getCurrentTimeCST() {

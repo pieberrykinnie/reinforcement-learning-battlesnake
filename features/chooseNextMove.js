@@ -145,7 +145,7 @@ function lookForFood(gameState) {
 // on the snake's health and how far it is from the given food in the previous function
 function goForFood(nearestFood, gameState) {
   const head = gameState.you.head;
-  const foodPriorityMultiplier = 800; // Modify this to determine how much the snake prioritizes food
+  const foodPriorityMultiplier = 300; // Modify this to determine how much the snake prioritizes food
 
   // Default value
   // Would be slightly better if it were a list of possible moves and multipliers added to them instead;
@@ -251,6 +251,15 @@ export const chooseNextMove = (model, currentStateTensor, gameState) => {
       }
     }
   }
+
+  const bumpDemotivator = 20; // Adjust to change how much the snake wants to avoid possible bumps
+  let possibleBumps = checkCornersForSnakes(gameState);
+  // console.log("unpreferred moves " + possibleBumps)
+  for (let i = 0; i < rankedActions.length; i++) {
+    if (possibleBumps.includes(rankedActions[i].action)) {
+      rankedActions[i].value -= bumpDemotivator;
+    }
+  }
   
   // Start of Peter's code
   let moveForFood = goForFood(lookForFood(gameState), gameState);
@@ -261,16 +270,7 @@ export const chooseNextMove = (model, currentStateTensor, gameState) => {
     }
   }
 
-  const bumpDemotivator = 20; // Adjust to change how much the snake wants to avoid possible bumps
-  let possibleBumps = checkCornersForSnakes(gameState);
-  console.log("unpreferred moves " + possibleBumps)
-  for (let i = 0; i < rankedActions.length; i++) {
-    if (possibleBumps.includes(rankedActions[i].action)) {
-      rankedActions[i].value -= bumpDemotivator;
-    }
-  }
-
-  const wallDemotivator = 3; // Adjust to change how much the snake wants to avoid being on the edges
+  const wallDemotivator = 5; // Adjust to change how much the snake wants to avoid being on the edges
   let movesToWall = avoidEdges(gameState);
   // console.log("unsure moves " + movesToWall)
   for (let i = 0; i < rankedActions.length; i++) {
