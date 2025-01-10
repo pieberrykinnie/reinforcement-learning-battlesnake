@@ -135,6 +135,16 @@ function end(gameState, model, replayBuffer) {
       // Save the model after training
       return saveModel(model)
     })
+    .then(() => {
+      // Auto-commit and push the new trained weights
+      exec('sh commit_and_push.sh', (err, stdout, stderr) => {
+        if (err) {
+          console.error('Error committing and pushing weights:', err)
+          return
+        }
+        console.log('Weights committed and pushed:', stdout)
+      })
+    })
     .catch((err) => {
       console.error('Error during model training:', err)
     })
