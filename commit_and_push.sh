@@ -7,4 +7,4 @@ git config --global user.name "Quoc Hoang Vu"
 # Add, commit, and push the new trained weights
 git add saved_model/
 git commit -m "Update trained weights"
-git push https://$GITHUB_TOKEN@github.com/pieberrykinnie/reinforcement-learning-battlesnake.git
+git push
