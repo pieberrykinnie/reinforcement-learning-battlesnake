@@ -6,6 +6,7 @@ import { trainModel } from './model/trainModel.js'
 import { ReplayBuffer } from './model/replayBuffer.js'
 import { loadModel } from './model/loadModel.js'
 import { saveModel } from './model/saveModel.js'
+import { exec } from 'child_process'
 
 //               
 
